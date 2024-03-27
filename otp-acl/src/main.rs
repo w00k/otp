@@ -46,18 +46,22 @@ fn main() {
         otp_key_enable: &true
     };
 
+    //create new otp key
     new_otp_key(pool, key_doo);
 
     pool = connection::connection::establish_connection();
     new_otp_key(pool, key_jess);
 
+    //find otp key
     pool = connection::connection::establish_connection();
     let otp_key_result = find_otp_key(pool, otp_key_doo);
+
+    //if otp key is found update retry
     if otp_key_result.is_ok() {
         let otp_key = otp_key_result.unwrap();
         pool = connection::connection::establish_connection();
         let retry = otp_key.retry - 1;
-        update_retry(pool, otp_key.id, retry);
+        update_retry(pool, otp_key.id, retry); //update retry
 
         let otp_key_doo = OtpKeyRequest {
             otp_public_key: otp_key.otp_public_key,
@@ -65,12 +69,14 @@ fn main() {
             otp_user: otp_key.otp_user,
         };
         pool = connection::connection::establish_connection();
-        _ = find_otp_key(pool, otp_key_doo);
+        _ = find_otp_key(pool, otp_key_doo); //verify otp key update
     }
 
+    //delete otp key with id 11
     pool = connection::connection::establish_connection();
     delete_by_id(pool, 11);
 
+    //delete otp keys by date
     let d2 = NaiveDate::from_ymd_opt(2024, 6, 3).unwrap();
     let t2 = NaiveTime::from_hms_milli_opt(12, 34, 56, 789).unwrap();
     let dt2 = NaiveDateTime::new(d2, t2);
