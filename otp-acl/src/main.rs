@@ -3,6 +3,7 @@ use crate::model::otp_keys::{NewOtpKey, OtpKeyRequest};
 use crate::query::delete::{delete_by_date, delete_by_id};
 use crate::query::insert::new_otp_key;
 use crate::query::select::find_otp_key;
+use crate::query::update::update_retry;
 
 mod connection;
 mod schema;
@@ -51,7 +52,21 @@ fn main() {
     new_otp_key(pool, key_jess);
 
     pool = connection::connection::establish_connection();
-    find_otp_key(pool, otp_key_doo);
+    let otp_key_result = find_otp_key(pool, otp_key_doo);
+    if otp_key_result.is_ok() {
+        let otp_key = otp_key_result.unwrap();
+        pool = connection::connection::establish_connection();
+        let retry = otp_key.retry - 1;
+        update_retry(pool, otp_key.id, retry);
+
+        let otp_key_doo = OtpKeyRequest {
+            otp_public_key: otp_key.otp_public_key,
+            otp_private_key: otp_key.otp_private_key,
+            otp_user: otp_key.otp_user,
+        };
+        pool = connection::connection::establish_connection();
+        _ = find_otp_key(pool, otp_key_doo);
+    }
 
     pool = connection::connection::establish_connection();
     delete_by_id(pool, 11);

@@ -1,4 +1,4 @@
-use diesel::delete;
+use diesel::{delete};
 use diesel::internal::derives::multiconnection::chrono;
 use diesel::prelude::*;
 
@@ -64,6 +64,13 @@ impl OtpKey {
     pub fn delete_by_date<'a>(conn: &mut PgConnection, input_expiration_date: chrono::NaiveDateTime) -> QueryResult<usize> {
         delete(otp_keys)
             .filter(otp_keys::expiration_date.le(input_expiration_date))
+            .execute(conn)
+    }
+
+    pub fn update_retry<'a>(conn: &mut PgConnection, update_id: i32, update_retry: i32) -> QueryResult<usize> {
+        diesel::update(otp_keys)
+            .filter(otp_keys::id.eq(update_id))
+            .set(retry.eq(update_retry))
             .execute(conn)
     }
 }
