@@ -1,11 +1,12 @@
-use diesel::{delete};
+use diesel::delete;
 use diesel::internal::derives::multiconnection::chrono;
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use super::schema::otp_keys;
 use super::schema::otp_keys::dsl::*;
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable)]
 #[diesel(table_name = crate::model::schema::otp_keys)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct OtpKey {
@@ -18,7 +19,15 @@ pub struct OtpKey {
     pub otp_key_enable: bool, 
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Serialize, Deserialize)]
+pub struct OtpKeyResponse {
+    pub otp_public_key: String,
+    pub otp_user: String,
+    pub retry: i32,
+    pub otp_key_enable: bool,
+}
+
+#[derive(Queryable, Selectable, Serialize)]
 #[diesel(table_name = crate::model::schema::otp_keys)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct OtpKeyRequest {
@@ -27,15 +36,25 @@ pub struct OtpKeyRequest {
     pub otp_user: String,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Clone, Serialize, Deserialize, Debug)]
 #[diesel(table_name = crate::model::schema::otp_keys)]
-pub struct NewOtpKey<'a> {
-    pub otp_public_key: &'a str,
-    pub otp_private_key: &'a str,
-    pub otp_user: &'a str,
-    pub retry: &'a i32,
-    pub expiration_date: &'a chrono::NaiveDateTime,
-    pub otp_key_enable: &'a bool, 
+pub struct NewOtpKey {
+    pub otp_public_key: String,
+    pub otp_private_key: String,
+    pub otp_user: String,
+    pub retry: i32,
+    pub expiration_date: chrono::NaiveDateTime,
+    pub otp_key_enable: bool, 
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct NewOtpKeyRequest {
+    pub otp_public_key: String,
+    pub otp_private_key: String,
+    pub otp_user: String,
+    pub retry: i32,
+    pub expiration_date: chrono::NaiveDateTime,
+    pub otp_key_enable: bool, 
 }
 
 impl OtpKey {
