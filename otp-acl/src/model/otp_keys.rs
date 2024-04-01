@@ -27,7 +27,14 @@ pub struct OtpKeyResponse {
     pub otp_key_enable: bool,
 }
 
-#[derive(Queryable, Selectable, Serialize)]
+#[derive(Serialize, Deserialize)]
+pub struct OtpMessageResponse {
+    pub code: String,
+    pub message: String,
+    pub datetime: chrono::NaiveDateTime,
+}
+
+#[derive(Queryable, Selectable, Serialize, Deserialize, Debug, Clone)]
 #[diesel(table_name = crate::model::schema::otp_keys)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct OtpKeyRequest {
@@ -67,7 +74,7 @@ impl OtpKey {
     pub fn select_otp_key<'a>(conn: &mut PgConnection, input_otp_key: OtpKeyRequest) -> Result<Vec<OtpKey>, diesel::result::Error> {
         otp_keys
             .filter(otp_keys::otp_public_key.eq(input_otp_key.otp_public_key))
-            .filter(otp_keys::otp_private_key.eq(input_otp_key.otp_private_key))
+            //.filter(otp_keys::otp_private_key.eq(input_otp_key.otp_private_key))
             .filter(otp_keys::otp_user.eq(input_otp_key.otp_user))
             .load(conn)
     }

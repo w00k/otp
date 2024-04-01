@@ -168,9 +168,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .service(greet)
-            //.service(examples)
-            //.service(controller::create_otp::create_otp_key)
             .route("/create", web::put().to(controller::create_otp::create_otp_key))
+            .route("/validate", web::post().to(controller::validate_otp::validate_otp_key))
     })
         .bind(("127.0.0.1", 8080))?
         .run()

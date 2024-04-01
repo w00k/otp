@@ -1,6 +1,6 @@
 use actix_web::{web, HttpResponse, Responder};
 
-use crate::model::otp_keys::{NewOtpKey, NewOtpKeyRequest, OtpKeyResponse};
+use crate::model::otp_keys::{NewOtpKey, OtpKeyResponse};
 use crate::query::insert::new_otp_key;
 use crate::connection::connection;
 

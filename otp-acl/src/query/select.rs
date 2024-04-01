@@ -1,9 +1,7 @@
 use diesel::{pg::PgConnection};
 use diesel::result::Error;
 
-use crate::model::{
-    otp_keys::{OtpKey},
-};
+use crate::model::otp_keys::{OtpKey};
 use crate::model::otp_keys::OtpKeyRequest;
 
 pub fn find_otp_key(mut conn: PgConnection, input_otp_key: OtpKeyRequest) -> Result<OtpKey, Error> {
