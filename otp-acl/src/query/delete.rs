@@ -1,9 +1,7 @@
-use diesel::{pg::PgConnection};
+use diesel::pg::PgConnection;
 use diesel::internal::derives::multiconnection::chrono;
 
-use crate::model::{
-    otp_keys::{OtpKey},
-};
+use crate::model::otp_keys::OtpKey;
 
 pub fn delete_by_id(mut conn: PgConnection, delete_id: i32) {
     let rows = OtpKey::delete_by_id(&mut conn, delete_id);

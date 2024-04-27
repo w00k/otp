@@ -64,6 +64,11 @@ pub struct NewOtpKeyRequest {
     pub otp_key_enable: bool, 
 }
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct DeleteByDateRequest {
+    pub expiration_date: chrono::NaiveDateTime,
+}
+
 impl OtpKey {
     pub fn create_otp_key<'a>(conn: &mut PgConnection, new_otp_key: &NewOtpKey) -> Result<OtpKey, diesel::result::Error> {
         diesel::insert_into(otp_keys::table)

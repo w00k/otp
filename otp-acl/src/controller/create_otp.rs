@@ -1,6 +1,7 @@
 use actix_web::{web, HttpResponse, Responder};
+use chrono::Utc;
 
-use crate::model::otp_keys::{NewOtpKey, OtpKeyResponse};
+use crate::model::otp_keys::{NewOtpKey, OtpKeyResponse, OtpMessageResponse};
 use crate::query::insert::new_otp_key;
 use crate::connection::connection;
 
@@ -21,6 +22,17 @@ pub async fn create_otp_key(otp: web::Json<NewOtpKey>) -> impl Responder {
         };
         HttpResponse::Created().json(response)
     } else {
-        HttpResponse::NotFound().json("ERROR")
+        let response = message_error();
+        HttpResponse::Ok().json(response)
     }
+}
+
+fn message_error() -> OtpMessageResponse {
+    let naive_date_time = Utc::now().naive_utc();
+    let response = OtpMessageResponse {
+        code: "NOT VALID".to_string(),
+        message: "OTP is not valid".to_string(),
+        datetime: naive_date_time,
+    };
+    return response;
 }
