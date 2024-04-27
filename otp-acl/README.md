@@ -2,7 +2,7 @@ Collection
 
 Create OPT Key
 
-´´´json
+```json
 curl --request PUT \
   --url http://127.0.0.1:8080/create \
   --header 'Content-Type: application/json' \
@@ -15,11 +15,11 @@ curl --request PUT \
   "expiration_date": "2024-06-03T12:34:56.789",
   "otp_key_enable": true
 }'
-´´´
+```
 
 Validate OTP Key
 
-´´´json
+```json
 curl --request POST \
   --url http://127.0.0.1:8080/validate \
   --header 'Content-Type: application/json' \
@@ -29,4 +29,4 @@ curl --request POST \
   "otp_private_key": "34567",
 	"otp_user": "w00k"
 }'
-´´´
+```
