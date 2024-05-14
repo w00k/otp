@@ -7,28 +7,13 @@ use utoipa::OpenApi;
 use utoipa_rapidoc::RapiDoc;
 use utoipa_scalar::{Scalar, Servable};
 use utoipa_swagger_ui::SwaggerUi;
+use crate::model::api_doc::ApiDoc;
 
 mod connection;
 mod schema;
 mod query;
 mod model;
 mod controller;
-
-#[derive(OpenApi)]
-#[openapi(
-    paths(
-        controller::create_otp::create_otp_key,
-        controller::validate_otp::validate_otp_key,
-        controller::delete_by_date::delete_otp_by_date
-    ),
-    components(
-        schemas(model::otp_keys::NewOtpKey, model::otp_keys::OtpKeyResponse, model::otp_keys::OtpMessageResponse, model::otp_keys::OtpKeyRequest, model::otp_keys::DeleteByDateRequest )
-    ),
-    tags(
-        (name = "todo", description = "Todo management endpoints.")
-    )
-)]
-pub struct ApiDoc();
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
