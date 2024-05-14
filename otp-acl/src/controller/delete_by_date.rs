@@ -1,10 +1,11 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder, post};
 use chrono::Utc;
 
 use crate::model::otp_keys::{DeleteByDateRequest, OtpMessageResponse};
 use crate::query::delete::delete_by_date;
 use crate::connection::connection;
 
+#[post("/delete-by-date")]
 pub async fn delete_otp_by_date(input_expiration_date: web::Json<DeleteByDateRequest>) -> impl Responder {
     log::info!("delete by expiration date {:?}", input_expiration_date);
     let expiration_date = input_expiration_date.into_inner();

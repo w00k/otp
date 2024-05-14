@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder, post};
 use chrono::Utc;
 
 use crate::model::otp_keys::{OtpKeyRequest, OtpMessageResponse};
@@ -7,6 +7,7 @@ use crate::query::delete::delete_by_id;
 use crate::query::select::find_otp_key;
 use crate::connection::connection;
 
+#[post("/validate")]
 pub async fn validate_otp_key(otp: web::Json<OtpKeyRequest>) -> impl Responder {
     log::info!("validate otp {:?}", otp);
     let otp_key_request: OtpKeyRequest = otp.into_inner();

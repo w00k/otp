@@ -1,10 +1,11 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder, put};
 use chrono::Utc;
 
 use crate::model::otp_keys::{NewOtpKey, OtpKeyResponse, OtpMessageResponse};
 use crate::query::insert::new_otp_key;
 use crate::connection::connection;
 
+#[put("/create")]
 pub async fn create_otp_key(otp: web::Json<NewOtpKey>) -> impl Responder {
     log::info!("create otp {:?}", otp);
     let otp_key_request: NewOtpKey = otp.into_inner();
