@@ -7,6 +7,12 @@ use crate::query::delete::delete_by_id;
 use crate::query::select::find_otp_key;
 use crate::connection::connection;
 
+#[utoipa::path(
+    request_body = OtpKeyRequest,
+    responses(
+        (status = 200, description = "Some response OK", body = [OtpMessageResponse])
+    )
+)]
 #[post("/validate")]
 pub async fn validate_otp_key(otp: web::Json<OtpKeyRequest>) -> impl Responder {
     log::info!("validate otp {:?}", otp);

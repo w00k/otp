@@ -2,6 +2,7 @@ use diesel::delete;
 use diesel::internal::derives::multiconnection::chrono;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 use super::schema::otp_keys;
 use super::schema::otp_keys::dsl::*;
@@ -19,7 +20,7 @@ pub struct OtpKey {
     pub otp_key_enable: bool, 
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct OtpKeyResponse {
     pub otp_public_key: String,
     pub otp_user: String,
@@ -27,14 +28,15 @@ pub struct OtpKeyResponse {
     pub otp_key_enable: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct OtpMessageResponse {
     pub code: String,
     pub message: String,
+    #[schema(value_type = String, format = DateTime, example = "2024-05-14T16:14:44.717966")]
     pub datetime: chrono::NaiveDateTime,
 }
 
-#[derive(Queryable, Selectable, Serialize, Deserialize, Debug, Clone)]
+#[derive(Queryable, Selectable, Serialize, Deserialize, Debug, Clone, ToSchema)]
 #[diesel(table_name = crate::model::schema::otp_keys)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct OtpKeyRequest {
@@ -43,29 +45,32 @@ pub struct OtpKeyRequest {
     pub otp_user: String,
 }
 
-#[derive(Insertable, Clone, Serialize, Deserialize, Debug)]
+#[derive(Insertable, Clone, Serialize, Deserialize, Debug, ToSchema)]
 #[diesel(table_name = crate::model::schema::otp_keys)]
 pub struct NewOtpKey {
     pub otp_public_key: String,
     pub otp_private_key: String,
     pub otp_user: String,
     pub retry: i32,
+    #[schema(value_type = String, format = DateTime, example = "2024-05-14T16:14:44.717966")]
     pub expiration_date: chrono::NaiveDateTime,
     pub otp_key_enable: bool, 
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, ToSchema)]
 pub struct NewOtpKeyRequest {
     pub otp_public_key: String,
     pub otp_private_key: String,
     pub otp_user: String,
     pub retry: i32,
+    #[schema(value_type = String, format = DateTime, example = "2024-05-14T16:14:44.717966")]
     pub expiration_date: chrono::NaiveDateTime,
     pub otp_key_enable: bool, 
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, ToSchema)]
 pub struct DeleteByDateRequest {
+    #[schema(value_type = String, format = DateTime, example = "2024-05-14T16:14:44.717966")]
     pub expiration_date: chrono::NaiveDateTime,
 }
 
@@ -79,7 +84,6 @@ impl OtpKey {
     pub fn select_otp_key<'a>(conn: &mut PgConnection, input_otp_key: OtpKeyRequest) -> Result<Vec<OtpKey>, diesel::result::Error> {
         otp_keys
             .filter(otp_keys::otp_public_key.eq(input_otp_key.otp_public_key))
-            //.filter(otp_keys::otp_private_key.eq(input_otp_key.otp_private_key))
             .filter(otp_keys::otp_user.eq(input_otp_key.otp_user))
             .load(conn)
     }

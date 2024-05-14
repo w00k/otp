@@ -5,6 +5,13 @@ use crate::model::otp_keys::{NewOtpKey, OtpKeyResponse, OtpMessageResponse};
 use crate::query::insert::new_otp_key;
 use crate::connection::connection;
 
+#[utoipa::path(
+    request_body = NewOtpKey,
+    responses(
+        (status = 201, description = "Create OTP Key", body = [OtpKeyResponse]),
+        (status = 200, description = "Some error message", body = [OtpMessageResponse])
+    )
+)]
 #[put("/create")]
 pub async fn create_otp_key(otp: web::Json<NewOtpKey>) -> impl Responder {
     log::info!("create otp {:?}", otp);

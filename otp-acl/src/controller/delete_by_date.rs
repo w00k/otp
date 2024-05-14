@@ -5,6 +5,12 @@ use crate::model::otp_keys::{DeleteByDateRequest, OtpMessageResponse};
 use crate::query::delete::delete_by_date;
 use crate::connection::connection;
 
+#[utoipa::path(
+    request_body = DeleteByDateRequest,
+    responses(
+        (status = 200, description = "Some response OK", body = [OtpMessageResponse])
+    )
+)]
 #[post("/delete-by-date")]
 pub async fn delete_otp_by_date(input_expiration_date: web::Json<DeleteByDateRequest>) -> impl Responder {
     log::info!("delete by expiration date {:?}", input_expiration_date);
