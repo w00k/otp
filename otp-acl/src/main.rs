@@ -1,8 +1,5 @@
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-use diesel::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool};
-
-use actix_web::{middleware, App, HttpServer};
+use actix_web::{middleware, App, HttpServer, web};
 use utoipa::OpenApi;
 use utoipa_rapidoc::RapiDoc;
 use utoipa_scalar::{Scalar, Servable};
@@ -26,6 +23,7 @@ async fn main() -> std::io::Result<()> {
     println!("{:?}", dt);
 
     let openapi = ApiDoc::openapi();
+    let pool = crate::connection::connection::establish_connection();
 
     HttpServer::new(move|| {
         App::new()
@@ -39,6 +37,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(RapiDoc::new("/api-docs/openapi.json").path("/rapidoc"))
             .service(Scalar::with_url("/scalar", openapi.clone()))
+            .app_data(web::Data::new(pool.clone()))
 
     })
         .bind(("127.0.0.1", 8080))?

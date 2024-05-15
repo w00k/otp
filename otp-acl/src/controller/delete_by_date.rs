@@ -3,7 +3,7 @@ use chrono::Utc;
 
 use crate::model::otp_keys::{DeleteByDateRequest, OtpMessageResponse};
 use crate::query::delete::delete_by_date;
-use crate::connection::connection;
+use crate::controller::create_otp::DbPool;
 
 #[utoipa::path(
     request_body = DeleteByDateRequest,
@@ -12,12 +12,12 @@ use crate::connection::connection;
     )
 )]
 #[post("/delete-by-date")]
-pub async fn delete_otp_by_date(input_expiration_date: web::Json<DeleteByDateRequest>) -> impl Responder {
+pub async fn delete_otp_by_date(pool:  web::Data<DbPool>, input_expiration_date: web::Json<DeleteByDateRequest>) -> impl Responder {
     log::info!("delete by expiration date {:?}", input_expiration_date);
     let expiration_date = input_expiration_date.into_inner();
 
-    let pool = connection::establish_connection();
-    delete_by_date(pool, expiration_date.expiration_date);
+    let mut conn = pool.get().expect("Problemas al traer la base de datos");
+    delete_by_date(&mut conn, expiration_date.expiration_date);
 
     let response = message_delete(expiration_date.expiration_date.to_string());
     HttpResponse::Ok().json(response)

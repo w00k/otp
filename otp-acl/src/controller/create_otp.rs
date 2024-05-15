@@ -1,9 +1,12 @@
 use actix_web::{web, HttpResponse, Responder, put};
 use chrono::Utc;
+use diesel::{PgConnection, r2d2};
+use diesel::r2d2::ConnectionManager;
 
 use crate::model::otp_keys::{NewOtpKey, OtpKeyResponse, OtpMessageResponse};
 use crate::query::insert::new_otp_key;
-use crate::connection::connection;
+
+pub type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 #[utoipa::path(
     request_body = NewOtpKey,
@@ -13,13 +16,14 @@ use crate::connection::connection;
     )
 )]
 #[put("/create")]
-pub async fn create_otp_key(otp: web::Json<NewOtpKey>) -> impl Responder {
+pub async fn create_otp_key(pool:  web::Data<DbPool>, otp: web::Json<NewOtpKey>) -> impl Responder {
     log::info!("create otp {:?}", otp);
     let otp_key_request: NewOtpKey = otp.into_inner();
 
-    let pool = connection::establish_connection();
+    //let pool = connection::establish_connection();
+    let mut conn = pool.get().expect("Problemas al traer la base de datos");
 
-    let otp = new_otp_key(pool, otp_key_request);
+    let otp = new_otp_key(&mut conn, otp_key_request);
     if otp.is_ok() {
         let otp_key = otp.unwrap();
         let response = OtpKeyResponse {

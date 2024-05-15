@@ -5,7 +5,7 @@ use crate::model::otp_keys::{OtpKeyRequest, OtpMessageResponse};
 use crate::query::update::update_retry;
 use crate::query::delete::delete_by_id;
 use crate::query::select::find_otp_key;
-use crate::connection::connection;
+use crate::controller::create_otp::DbPool;
 
 #[utoipa::path(
     request_body = OtpKeyRequest,
@@ -14,27 +14,25 @@ use crate::connection::connection;
     )
 )]
 #[post("/validate")]
-pub async fn validate_otp_key(otp: web::Json<OtpKeyRequest>) -> impl Responder {
+pub async fn validate_otp_key(pool:  web::Data<DbPool>, otp: web::Json<OtpKeyRequest>) -> impl Responder {
     log::info!("validate otp {:?}", otp);
     let otp_key_request: OtpKeyRequest = otp.into_inner();
-    let pool = connection::establish_connection();
-    let otp_key_response = find_otp_key(pool, otp_key_request.clone());
+    let mut conn = pool.get().expect("Problemas al traer la base de datos");
+    let otp_key_response = find_otp_key(&mut conn, otp_key_request.clone());
     
     if otp_key_response.is_ok() {
-        let pool = connection::establish_connection();
         let otp_key = otp_key_response.unwrap();
 
         if otp_key.otp_private_key == otp_key_request.otp_private_key && otp_key.retry > 0 {
             let response = message_ok();
-            delete_by_id(pool, otp_key.id);
+            delete_by_id(&mut conn, otp_key.id);
             HttpResponse::Ok().json(response)   
         } else { 
-            let pool = connection::establish_connection();
             if otp_key.otp_private_key != otp_key_request.otp_private_key && otp_key.retry > 0 {
                 let retry = otp_key.retry - 1;
-                update_retry(pool, otp_key.id, retry); 
+                update_retry(&mut conn, otp_key.id, retry);
             } else {
-                delete_by_id(pool, otp_key.id);
+                delete_by_id(&mut conn, otp_key.id);
             }
             let response = message_not_ok();
             HttpResponse::Ok().json(response)
