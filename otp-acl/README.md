@@ -29,6 +29,12 @@ $ diesel migration run --database-url postgres://postgres:postgres@localhost:543
 $ diesel migration redo
 ```
 
+If you have some problem with the data base, You can run the [schema](https://github.com/w00k/otp/blob/main/otp-acl/migrations/00000000000000_diesel_initial_setup/up.sql) manually ()
+
+## Swagger
+
+The link for swagger [http://localhost:8080/swagger-ui/](http://localhost:8080/swagger-ui/)
+
 ## Collection 
 
 Create OPT Key
